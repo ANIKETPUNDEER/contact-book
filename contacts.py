@@ -1,3 +1,4 @@
+import json
 contacts = []
 
 def add_contact():
@@ -8,6 +9,7 @@ def add_contact():
     details = {"name": name.strip().lower(), "phone": phone, "email": email}
 
     contacts.append(details)
+    save_contacts()
 
 def view_contacts():
     for person in contacts:
@@ -27,11 +29,25 @@ def delete_contact():
     for person in contacts:
         if person["name"] == name.strip().lower():
             contacts.remove(person)
+            save_contacts()
             print("Contact Deleted")
             return
     print("Contact not found")
 
+def save_contacts():
+    with open("contacts.json", "w") as file:
+        json.dump(contacts, file)
+
+def load_contacts():
+    global contacts
+    try:
+        with open("contacts.json", "r") as file:
+            contacts = json.load(file)
+    except FileNotFoundError:
+        contacts = []
+
 def main():
+    load_contacts()
     while True:
         print("\n1. Add Contact")
         print("2. View Contacts")
