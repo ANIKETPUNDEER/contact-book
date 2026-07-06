@@ -2,14 +2,19 @@ import json
 contacts = []
 
 def add_contact():
-    name = input("Name: ")
-    phone = input("Phone: ")
-    email = input("Email: ")
+    name = input("Name: ").strip()
+    phone = input("Phone: ").strip()
+    email = input("Email: ").strip()
 
-    details = {"name": name.strip().lower(), "phone": phone, "email": email}
+    if not name or not phone or not email:
+        print("Error: All fields (name, phone, email) are required!")
+        return
+
+    details = {"name": name, "phone": phone, "email": email}
 
     contacts.append(details)
     save_contacts()
+    print("Contact added successfully!")
 
 def view_contacts():
     for person in contacts:
@@ -17,9 +22,9 @@ def view_contacts():
 
 
 def search_contact():
-    name = input("Enter the name you want to search: ")
+    name = input("Enter the name you want to search: ").strip()
     for person in contacts:
-        if person["name"] == name.strip().lower():
+        if person["name"].lower() == name.lower():
             print("Name: ", person["name"], "Phone: ", person["phone"], "Email: ", person["email"])
             return
     print("Contact not found")
@@ -35,8 +40,11 @@ def delete_contact():
     print("Contact not found")
 
 def save_contacts():
-    with open("contacts.json", "w") as file:
-        json.dump(contacts, file)
+    try:
+        with open("contacts.json", "w") as file:
+            json.dump(contacts, file, indent=2)
+    except IOError as e:
+        print(f"Error saving contacts: {e}")
 
 def load_contacts():
     global contacts
@@ -44,6 +52,9 @@ def load_contacts():
         with open("contacts.json", "r") as file:
             contacts = json.load(file)
     except FileNotFoundError:
+        contacts = []
+    except json.JSONDecodeError:
+        print("Warning: Corrupted contacts file. Starting fresh.")
         contacts = []
 
 def main():
@@ -71,4 +82,5 @@ def main():
         else:
             print("Enter a valid number!")
 
-main()
+if __name__ == "__main__":
+    main()
